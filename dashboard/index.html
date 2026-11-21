@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — pre-token protocols ranked by implied launch value</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="radar-dot" aria-hidden="true"></span><span class="brand-name">Token Radar</span></div>
+  <div class="top-meta"><span id="asof"></span><span class="sep">·</span><span id="modelver"></span><span class="sep">·</span><span>snapshot: DefiLlama</span></div>
+</header>
+<main>
+  <section class="lede">
+    <h1>Which protocol has waited longest for its token?</h1>
+    <p class="lede-text">Every protocol DefiLlama tracks, ranked by what its token would be worth if it launched today. The board covers the whole watchlist of pre-token protocols above $50M TVL, plus every other pre-token protocol the snapshot carries. Live-token protocols are set aside and shown at the market's own value, never mixed into the ranking.</p>
+    <div class="stats" id="stats"></div>
+  </section>
+  <section class="controls" aria-label="Board controls">
+    <input id="q" type="search" placeholder="Search a protocol…" autocomplete="off" aria-label="Search protocols">
+    <select id="category" aria-label="Filter by category"><option value="">All categories</option></select>
+    <select id="chain" aria-label="Filter by chain"><option value="">All chains</option></select>
+    <select id="sort" aria-label="Sort the board">
+      <option value="implied">Sort: implied value</option>
+      <option value="tvl">Sort: TVL</option>
+      <option value="growth">Sort: 7-day growth</option>
+      <option value="age">Sort: age</option>
+      <option value="name">Sort: name</option>
+    </select>
+    <div class="tabs" role="tablist" aria-label="Board view">
+      <button id="tab-pre" role="tab" aria-selected="true">Pre-token</button>
+      <button id="tab-live" role="tab" aria-selected="false">Live token</button>
+    </div>
+  </section>
+  <p class="count" id="count"></p>
+  <section class="board-wrap">
+    <table class="board" id="board">
+      <thead><tr>
+        <th class="num">#</th><th>Protocol</th><th>Category</th><th>Chains</th>
+        <th class="num">TVL</th><th class="num">7d</th><th class="num">Age</th><th class="num">Implied value</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <table class="board live-board" id="liveboard" hidden>
+      <thead><tr>
+        <th class="num">#</th><th>Protocol</th><th>Category</th><th>Chains</th>
+        <th class="num">TVL</th><th class="num">7d</th><th class="num">Market cap</th>
+      </tr></thead>
+      <tbody id="liverows"></tbody>
+    </table>
+  </section>
+  <section class="method" id="method">
+    <h2>How the implied value is worked out</h2>
+    <p class="formula">implied = TVL × category multiple × growth multiplier × maturity multiplier</p>
+    <ul class="method-list">
+      <li><strong>Category multiple.</strong> For each category, the median market-cap-to-TVL ratio of the protocols in that category whose token already trades (at least three of them). A category with too few live comps falls back to the global median across all live-token protocols. The multiple is recomputed from this snapshot on every run — no protocol name is ever special-cased, and no multiple is hardcoded.</li>
+      <li><strong>Growth multiplier.</strong> 1 + (7-day TVL change, clamped to −60%…+120%) ÷ 100 × 0.25. Growth is a whisper here: a shrinking protocol is barely punished, because the thesis is about waiting, not momentum.</li>
+      <li><strong>Maturity multiplier.</strong> 0.3 + min(age in days, 730) ÷ 730 × 0.7. Age is the story: a protocol that has run for two years with no token is far closer to a launch than one listed last month, so the maturity factor spans 0.3 to 1.0 over two years.</li>
+      <li><strong>What it is not.</strong> The implied value is a model of what a launch could be worth, not a price and not a promise. It says nothing about whether a token will launch at all.</li>
+    </ul>
+    <h3>Calibration — median mcap / TVL of live-token protocols, from this snapshot</h3>
+    <p class="calib-note" id="calibnote"></p>
+    <div class="calib-wrap"><table class="calib" id="calib"><thead><tr><th>Category</th><th class="num">Multiple</th><th class="num">Live comps</th><th>Source</th></tr></thead><tbody id="calibrows"></tbody></table></div>
+  </section>
+  <footer class="foot">
+    <p>Token Radar · model <span id="modelver2"></span> · snapshot <span id="asof2"></span>, DefiLlama protocols. The page renders with no network: all data is in the data file beside it.</p>
+  </footer>
+</main>
+<dialog id="detail" class="detail">
+  <form method="dialog" class="detail-close"><button aria-label="Close detail">×</button></form>
+  <div id="detail-body"></div>
+</dialog>
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
